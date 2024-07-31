@@ -13,6 +13,8 @@ import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
 import stylesheet from "~/tailwind.css?url";
 import { themeSessionResolver } from "./utils/session.server";
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes";
+import { ReactNode } from "react";
+import NavBar from "./components/NavBar";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
@@ -35,9 +37,9 @@ export default function AppwithProvider(){
   )
 }
 
-export function Layout({ children }: { children: React.ReactNode }) {
-  const {theme} = useLoaderData<typeof loader>();
-  const themeX = useTheme();
+export function App() {
+  const theme = useLoaderData<typeof loader>();
+  const [themeX] = useTheme();
   return (
     <html lang="en" data-theme={themeX?? ""}>
       <head>
@@ -47,16 +49,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <PreventFlashOnWrongTheme ssrTheme={Boolean(theme)}/>
         <Links />
       </head>
-      <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-        {process.env.NODE_ENV === 'development' && <LiveReload/>}
+      <body className="bg-white text-black dark:bg-gray-900 dark:text-white h-full  selection:bg-gray-50 dark:selection:bg-gray-800">
+        <Layout>
+          <Outlet/>
+          <ScrollRestoration />
+          <Scripts />
+          {process.env.NODE_ENV === 'development' && <LiveReload/>}
+        </Layout>
       </body>
     </html>
   );
 }
 
-function App() {
-  return <Outlet />;
+function Layout({ children }: {children: ReactNode}){
+
+  return (
+    <div>
+    <NavBar/>
+    <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      {children}
+    </main>
+    </div>
+  )
 }
+
